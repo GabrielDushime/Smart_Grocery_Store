@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  backend:
+    build: .
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: gabriel
+      POSTGRES_PASSWORD: 6BpwLa8z6GpBlATA3NP6fnS6uhW2JyOo
+      POSTGRES_DB: smart_grocery_store
+    ports:
+      - "5432:5432"
