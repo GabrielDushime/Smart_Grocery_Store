@@ -1,3 +1,4 @@
+
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -17,6 +18,7 @@ import { MqttModule } from './services/mqtt.module';
 import { ThingspeakModule } from './services/thingspeak.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { SimulationModule } from './modules/simulation/simulation.module';
+
 
 
 @Module({
