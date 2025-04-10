@@ -64,4 +64,12 @@ export class CheckoutController {
   getOrderDetails(@Request() req, @Param('id') id: string) {
     return this.checkoutService.getOrderDetails(req.user.id, id);
   }
+  @Delete('orders/:id')
+@ApiOperation({ summary: 'Delete an order' })
+@ApiResponse({ status: 200, description: 'Order deleted successfully' })
+@ApiResponse({ status: 404, description: 'Order not found' })
+async deleteOrder(@Request() req, @Param('id') id: string) {
+  await this.checkoutService.deleteOrder(req.user.id, id);
+  return { message: 'Order deleted successfully' };
+}
 }

@@ -252,4 +252,38 @@ export class CheckoutService {
     
     return completedOrder;
   }
+  async deleteOrder(userId: string, orderId: string): Promise<void> {
+   
+    const order = await this.orderRepository.findOne({
+      where: { id: orderId, userId },
+      relations: ['items']
+    });
+    
+    if (!order) {
+      throw new NotFoundException(`Order with ID ${orderId} not found or doesn't belong to this user`);
+    }
+    
+    
+    if (order.status === 'completed') {
+    
+      for (const item of order.items) {
+        await this.inventoryService.updateStock(item.productId, item.quantity);
+      }
+      
+      
+      this.mqttService.publish('checkout/order-deleted', JSON.stringify({
+        orderId: order.id,
+        userId,
+        timestamp: new Date().toISOString(),
+      }));
+    }
+    
+   
+    if (order.items && order.items.length > 0) {
+      await this.cartRepository.remove(order.items);
+    }
+    
+  
+    await this.orderRepository.remove(order);
+  }
 }

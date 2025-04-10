@@ -12,7 +12,9 @@ export class Inventory {
   @ApiProperty({ description: 'The product ID' })
   productId: string;
 
-  @ManyToOne(() => Product, product => product.inventory)
+  @ManyToOne(() => Product, product => product.inventory, {
+    onDelete: 'CASCADE'
+  })
   @JoinColumn({ name: 'productId' })
   product: Product;
 

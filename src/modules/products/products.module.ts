@@ -1,11 +1,17 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ProductsService } from './products.service';
+import { MulterModule } from '@nestjs/platform-express';
 import { ProductsController } from './products.controller';
+import { ProductsService } from './products.service';
 import { Product } from './entities/product.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Product])],
+  imports: [
+    TypeOrmModule.forFeature([Product]),
+    MulterModule.register({
+      dest: './public/images',
+    }),
+  ],
   controllers: [ProductsController],
   providers: [ProductsService],
   exports: [ProductsService],

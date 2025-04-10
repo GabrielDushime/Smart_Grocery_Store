@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class ProductsService {
@@ -50,19 +52,63 @@ export class ProductsService {
 
   async update(id: string, updateProductDto: UpdateProductDto): Promise<Product> {
     const product = await this.findOne(id);
+    
+
+    if (updateProductDto.imageUrl && product.imageUrl && product.imageUrl !== updateProductDto.imageUrl) {
+      try {
+        const oldImagePath = path.join(process.cwd(), 'public', product.imageUrl);
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+        }
+      } catch (error) {
+        console.error('Error deleting old image:', error);
+      }
+    }
+    
     Object.assign(product, updateProductDto);
     return this.productsRepository.save(product);
   }
 
+  async setInactive(id: string): Promise<Product> {
+    const product = await this.findOne(id);
+    
+
+    product.isActive = false;
+    return this.productsRepository.save(product);
+  }
+  
   async remove(id: string): Promise<void> {
     const product = await this.findOne(id);
-    product.isActive = false;
-    await this.productsRepository.save(product);
+    
+   
+    if (product.imageUrl) {
+      try {
+        const imagePath = path.join(process.cwd(), 'public', product.imageUrl);
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        }
+        
+      
+        const frontendPath = path.join(process.cwd(), '..', 'smart-grocery-store-frontend', 'public', product.imageUrl);
+        if (fs.existsSync(frontendPath)) {
+          fs.unlinkSync(frontendPath);
+        }
+      } catch (error) {
+        console.error('Error deleting product image files:', error);
+      }
+    }
+    
+  
+    await this.productsRepository.remove(product);
   }
 
   async getCategories(): Promise<string[]> {
     const products = await this.productsRepository.find({ select: ['category'] });
     const categories = products.map(product => product.category);
-    return [...new Set(categories)]; 
+    return [...new Set(categories)];
+  }
+
+  async findAllIncludingInactive(): Promise<Product[]> {
+    return this.productsRepository.find();
   }
 }

@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Inventory } from '../../inventory/entities/inventory.entity';
+import { CartItem } from '../../checkout/entities/cart.entity';
 
 @Entity('products')
 export class Product {
@@ -27,8 +28,7 @@ export class Product {
   @Column({ type: 'varchar', default: 'Unknown' })
   @ApiProperty({ description: 'The category of the product' })
   category: string;
-
-
+  
   @Column({ nullable: true })
   @ApiProperty({ description: 'The barcode of the product', required: false })
   barcode?: string;
@@ -45,8 +45,17 @@ export class Product {
   @ApiProperty({ description: 'The location of the product in the store', required: false })
   location?: string;
 
-  @OneToMany(() => Inventory, inventory => inventory.product)
+  @OneToMany(() => Inventory, inventory => inventory.product, {
+    cascade: true,
+    onDelete: 'CASCADE'
+  })
   inventory: Inventory[];
+
+  @OneToMany(() => CartItem, cartItem => cartItem.product, {
+    cascade: true,
+    onDelete: 'CASCADE'
+  })
+  cartItems: CartItem[];
 
   @CreateDateColumn()
   @ApiProperty({ description: 'The timestamp when the product was created' })

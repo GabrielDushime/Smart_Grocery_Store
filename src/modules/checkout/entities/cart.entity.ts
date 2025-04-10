@@ -21,7 +21,9 @@ export class CartItem {
   @ApiProperty({ description: 'The product ID' })
   productId: string;
 
-  @ManyToOne(() => Product)
+  @ManyToOne(() => Product, product => product.cartItems, {
+    onDelete: 'CASCADE'
+  })
   @JoinColumn({ name: 'productId' })
   product: Product;
 

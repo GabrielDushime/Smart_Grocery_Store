@@ -80,7 +80,7 @@ export class AnalyticsService {
       });
     });
     
-    // Convert to array and sort by quantity
+  
     const topProducts = Object.values(productSales)
       .sort((a: any, b: any) => b.quantity - a.quantity)
       .slice(0, limit);
@@ -93,7 +93,7 @@ export class AnalyticsService {
       relations: ['product'],
     });
     
-    // Using currentStock and minStockLevel based on the provided entity definitions
+  
     const lowStockItems = inventory.filter(item => item.currentStock <= item.minStockLevel);
     const outOfStockItems = inventory.filter(item => item.currentStock === 0);
     
